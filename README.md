@@ -22,3 +22,5 @@ cursor.execute(sql)
 
 print(cursor.fetchone())
 ```
+
+This code is raw and incomplete. You will need an IOx organization in InfluxDB Cloud to use it.
