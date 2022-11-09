@@ -58,7 +58,7 @@ class IOxCursor:
             return None
         if len(self._result) == 0:
             return None
-            
+
         else:
             for column in self._result[self._table_index].columns:
                 desc.append((column.label,
@@ -130,9 +130,13 @@ class IOxCursor:
             results.append(tuple(record.values.values()))
         return results
             
-    def execute(self, statement):
+    def execute(self, operation, seq_of_parameters=[]):
+        for param in seq_of_parameters:
+            operation = operation.replace("?",str(param),1)
+            print(operation)
+
         flux = f"""import "experimental/iox"
-iox.sql(bucket: "{self._connection.bucket}", query: "{statement}") """
+iox.sql(bucket: "{self._connection.bucket}", query: "{operation}") """
         self._result = self._query_api.query(flux, org=self._connection.org)
         self._reset_results()
 
