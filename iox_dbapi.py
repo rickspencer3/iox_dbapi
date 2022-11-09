@@ -52,8 +52,14 @@ class IOxCursor:
 
     @property
     def decscription(self):
-        return None
-    
+        desc = []
+        if self._result is None:
+            return None
+        else:
+            for column in self._result[self._table_index].columns:
+                desc.append((column.label,column.data_type,None,None,None,None,None))
+        return desc
+        
     @property
     def rowcount(self):
         if self._result is None:

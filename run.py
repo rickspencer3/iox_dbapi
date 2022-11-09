@@ -12,5 +12,5 @@ cursor = connection.cursor()
 sql = "SELECT x, time FROM vibrations WHERE time > (NOW() - interval'10 seconds')::timestamp LIMIT 10"
 cursor.execute(sql)
 
-
+print(cursor.decscription)
 print(cursor.fetchone())
