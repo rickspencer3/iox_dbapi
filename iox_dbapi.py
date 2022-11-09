@@ -1,4 +1,5 @@
 from influxdb_client import InfluxDBClient
+from enum import Enum
 
 apilevel = "2.0"
 threadsafety = 0
@@ -57,9 +58,21 @@ class IOxCursor:
             return None
         else:
             for column in self._result[self._table_index].columns:
-                desc.append((column.label,column.data_type,None,None,None,None,None))
+                desc.append((column.label,
+                            self._convert_from_iox(column.data_type).value,
+                            None,None,None,None,None))
         return desc
-        
+
+    def _convert_from_iox(self, type_string):
+        if type_string == "string":
+            return DataTypes.STRING
+        elif type_string == "long":
+            return DataTypes.INTEGER
+        elif type_string == "double":
+            return DataTypes.FLOAT
+        elif type_string == "dateTime:RFC3339":
+            return DataTypes.DATETIME
+
     @property
     def rowcount(self):
         if self._result is None:
@@ -117,3 +130,68 @@ class IOxCursor:
 iox.sql(bucket: "{self._connection.bucket}", query: "{statement}") """
         self._result = self._query_api.query(flux, org=self._connection.org)
         self._reset_results()
+
+class DataTypes(Enum):
+    STRING = 0
+    DATETIME = 1
+    TIMESTAMP = 2
+    INTEGER = 3
+    FLOAT = 4
+
+
+
+
+# {0: 'DECIMAL',
+#  1: 'TINY',
+#  2: 'SHORT',
+#  3: 'LONG',
+#  4: 'FLOAT',
+#  5: 'DOUBLE',
+#  6: 'NULL',
+#  7: 'TIMESTAMP',
+#  8: 'LONGLONG',
+#  9: 'INT24',
+#  10: 'DATE',
+#  11: 'TIME',
+#  12: 'DATETIME',
+#  13: 'YEAR',
+#  14: 'NEWDATE',
+#  15: 'VARCHAR',
+#  16: 'BIT',
+#  246: 'NEWDECIMAL',
+#  247: 'INTERVAL',
+#  248: 'SET',
+#  249: 'TINY_BLOB',
+#  250: 'MEDIUM_BLOB',
+#  251: 'LONG_BLOB',
+#  252: 'BLOB',
+#  253: 'VAR_STRING',
+#  254: 'STRING',
+#  255: 'GEOMETRY'}
+
+
+# Date(year, month, day)
+# This function constructs an object holding a date value.
+# Time(hour, minute, second)
+# This function constructs an object holding a time value.
+# Timestamp(year, month, day, hour, minute, second)
+# This function constructs an object holding a time stamp value.
+# DateFromTicks(ticks)
+# This function constructs an object holding a date value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
+# TimeFromTicks(ticks)
+# This function constructs an object holding a time value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
+# TimestampFromTicks(ticks)
+# This function constructs an object holding a time stamp value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
+# Binary(string)
+# This function constructs an object capable of holding a binary (long) string value.
+# STRING type
+# This type object is used to describe columns in a database that are string-based (e.g. CHAR).
+# BINARY type
+# This type object is used to describe (long) binary columns in a database (e.g. LONG, RAW, BLOBs).
+# NUMBER type
+# This type object is used to describe numeric columns in a database.
+# DATETIME type
+# This type object is used to describe date/time columns in a database.
+# ROWID type
+
+
