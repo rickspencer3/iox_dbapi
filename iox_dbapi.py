@@ -1,5 +1,7 @@
+from typing import Type
 from influxdb_client import InfluxDBClient
 from enum import Enum
+import datetime
 
 apilevel = "2.0"
 threadsafety = 0
@@ -149,29 +151,35 @@ class DataTypes(Enum):
     BOOL = 5
 
 
+def Date(year, month, day):
+    return datetime.date(year= year, month=month, day=day)
 
-# Date(year, month, day)
-# This function constructs an object holding a date value.
-# Time(hour, minute, second)
-# This function constructs an object holding a time value.
-# Timestamp(year, month, day, hour, minute, second)
-# This function constructs an object holding a time stamp value.
-# DateFromTicks(ticks)
-# This function constructs an object holding a date value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
-# TimeFromTicks(ticks)
-# This function constructs an object holding a time value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
-# TimestampFromTicks(ticks)
-# This function constructs an object holding a time stamp value from the given ticks value (number of seconds since the epoch; see the documentation of the standard Python time module for details).
-# Binary(string)
-# This function constructs an object capable of holding a binary (long) string value.
-# STRING type
-# This type object is used to describe columns in a database that are string-based (e.g. CHAR).
-# BINARY type
-# This type object is used to describe (long) binary columns in a database (e.g. LONG, RAW, BLOBs).
-# NUMBER type
-# This type object is used to describe numeric columns in a database.
-# DATETIME type
-# This type object is used to describe date/time columns in a database.
-# ROWID type
+def Time(hour, minute, second):
+    return datetime.time(hour=hour, minute=minute, second=second)
+
+
+def Timestamp(year, month, day, hour, minute, second):
+    dt = datetime.datetime(year=year, month=month, day=day, minute=minute, second=second)
+    return dt.isoformat()
+
+def DateFromTicks(ticks):
+    dt = datetime.datetime.fromtimestamp(ticks)
+    return dt.date()
+
+def TimeFromTicks(ticks):
+    return datetime.datetime.fromtimestamp(ticks)
+   
+def TimestampFromTicks(ticks):
+    dt = datetime.datetime.fromtimestamp(ticks)
+    return dt.isoformat()
+
+def Binary(string):
+    return string
+
+STRING = Type('str')
+BINARY = Type('str')
+NUMBER = Type('int float')
+DATETIME = Type('datetime')
+ROWID = Type('int')
 
 
