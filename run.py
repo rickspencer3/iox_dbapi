@@ -1,16 +1,16 @@
-import iox_dbapi;
+import ioxdb;
 import os
 
-connection = iox_dbapi.connect(
+connection = ioxdb.connect(
     host = os.environ["HOST"],
-    org = os.environ["ORG"],
     bucket = os.environ["BUCKET"],
     token = os.environ["TOKEN"]
 )
 
 cursor = connection.cursor()
-sql = "SELECT x, time FROM vibrations WHERE time > (NOW() - interval'10 seconds')::timestamp LIMIT 10"
-cursor.execute(sql)
+sql = "SELECT x, time FROM ? WHERE time > (NOW() - interval'? seconds')::timestamp LIMIT ?"
+cursor.execute(sql, ["vibrations",10, 10])
 
+print(dir(ioxdb.DataTypes))
 print(cursor.decscription)
 print(cursor.fetchone())

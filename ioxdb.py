@@ -7,14 +7,13 @@ apilevel = "2.0"
 threadsafety = 0
 paramstyle = "qmark"
 
-def connect(host=None, token=None, org=None, bucket=None):
-    return IOxConnection(host=host, token=token, bucket=bucket)
+def connect(host=None, token=None, bucket=None):
+    return IOxConnection(host=host, token=token, bucket=bucket )
 
 class IOxConnection:
-    def __init__(self, host=None, token=None, org=None, bucket=None):
+    def __init__(self, host=None, token=None, bucket=None):
         self.host = host
         self.token = token
-        self.org = org
         self.bucket = bucket
 
     def cursor(self):
@@ -24,10 +23,13 @@ class IOxConnection:
     #IOx is not a transactional database and does not hold a connection open.
     #Therefor the following interface functions are noops
     def close(self):
+        """InfluxDB does not hold open a connection so this function is a noop"""
         pass
     def commit(self):
+        """InfluxDB does not support transactions, so this function is noop"""
         pass
     def rollback(self):
+        """InfluxDB does not support transactions, so this function is noop"""
         pass
 
 class IOxCursor:
@@ -35,8 +37,7 @@ class IOxCursor:
         self._closed = False
         self._connection = connection
         self._query_api = InfluxDBClient(url=self._connection.host, 
-                                                token=self._connection.token, 
-                                                org=self._connection.org).query_api()
+                                                token=self._connection.token).query_api()
         self._reset_results()
         self._arraysize = 1
         self._result = None
@@ -139,8 +140,38 @@ class IOxCursor:
 
         flux = f"""import "experimental/iox"
 iox.sql(bucket: "{self._connection.bucket}", query: "{operation}") """
-        self._result = self._query_api.query(flux, org=self._connection.org)
+        self._result = self._query_api.query(flux)
         self._reset_results()
+
+class Error(Exception):
+    pass
+
+class Warning(Exception):
+    pass
+
+class InterfaceError(Error):
+    pass
+
+class DatabaseError(Error):
+    pass
+
+class InternalError(DatabaseError):
+    pass
+
+class OperationalError(DatabaseError):
+    pass
+
+class ProgrammingError(DatabaseError):
+    pass
+
+class IntegrityError(DatabaseError):
+    pass
+
+class DataError(DatabaseError):
+    pass
+
+class NotSupportedError(DatabaseError):
+    pass
 
 class DataTypes(Enum):
     STRING = 0
